@@ -32,8 +32,14 @@ button{width:100%;padding:14px;border:0;border-radius:10px;background:#0077ff;co
 
 <script>
 const params = new URLSearchParams(window.location.search);
+
 const site = params.get("site") || "default";
 const device = params.get("device") || "unknown";
+
+const linkLogin = params.get("link_login");
+const linkOrig = params.get("link_orig") || "https://waveo.com.au";
+const mac = params.get("client_mac") || "";
+const ip = params.get("client_ip") || "";
 
 async function loadConfig(){
   const res = await fetch(`/api/config?site=${site}`);
@@ -54,12 +60,15 @@ document.getElementById("form").addEventListener("submit", async (e)=>{
   await fetch("/api/session", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({ email, site, device })
+    body:JSON.stringify({ email, site, device, mac, ip })
   });
 
-  window.location.href = "https://waveo.com.au";
+  if (linkLogin) {
+    window.location.href = `${linkLogin}?username=guest&password=guest123`;
+  } else {
+    window.location.href = linkOrig;
+  }
 });
 </script>
-
 </body>
 </html>
