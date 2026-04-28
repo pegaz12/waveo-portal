@@ -1,1 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Waveo WiFi</title>
 
+<style>
+body{margin:0;font-family:Arial;background:#eef6ff;display:flex;align-items:center;justify-content:center;height:100vh}
+.card{background:white;width:92%;max-width:420px;padding:28px;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.1)}
+h1{margin:0 0 10px}
+input{width:100%;padding:14px;border:1px solid #ddd;border-radius:10px;margin:12px 0}
+button{width:100%;padding:14px;border:0;border-radius:10px;background:#0077ff;color:white;font-weight:bold}
+.small{font-size:12px;color:#666}
+</style>
+
+</head>
+<body>
+
+<div class="card">
+  <h1 id="title">Connect</h1>
+  <p id="subtitle">Enter your email to continue</p>
+
+  <form id="form">
+    <input id="email" type="email" placeholder="Email" required>
+    <label class="small">
+      <input type="checkbox" required> Accept terms
+    </label>
+    <br><br>
+    <button>Connect</button>
+  </form>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const site = params.get("site") || "default";
+const device = params.get("device") || "unknown";
+
+async function loadConfig(){
+  const res = await fetch(`/api/config?site=${site}`);
+  const cfg = await res.json();
+
+  document.getElementById("title").innerText = cfg.title;
+  document.getElementById("subtitle").innerText = cfg.subtitle;
+  document.querySelector("button").style.background = cfg.color;
+}
+
+loadConfig();
+
+document.getElementById("form").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  const email = document.getElementById("email").value;
+
+  await fetch("/api/session", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ email, site, device })
+  });
+
+  window.location.href = "https://waveo.com.au";
+});
+</script>
+
+</body>
+</html>
